@@ -26,21 +26,29 @@ interface LocationData {
 export default function App() {
   const [data, setData] = React.useState<LocationData>();
   const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState(null);
   React.useEffect(() => {
-    setLoading(true)
-    fetch('https://api.techniknews.net/ipgeo/141.164.56.208')
+    setLoading(true);
+    fetch('https://api.techniknews.net/ipgeo/141.164.56.208a')
       .then((res) => {
-        return res.json();
+        if (res.ok) {
+          return res.json();
+        }
+        throw new Error('数据请求失败！');
       })
       .then((data) => {
         setData(data);
         setLoading(false);
       })
-      .catch();
+      .catch((e) => {
+        console.log(e);
+        setLoading(false);
+        setError(e);
+      });
   }, []);
   return (
     <div>
-      {!loading && data && (
+      {!loading && data && !error && (
         <div>
           <p>IP地址：{data.ip}</p>
           {Object.entries(data).map(([key, value]) => (
@@ -51,6 +59,7 @@ export default function App() {
         </div>
       )}
       {loading && <p>Loading...</p>}
+      {error && <p>数据加载异常！</p>}
     </div>
   );
 }
