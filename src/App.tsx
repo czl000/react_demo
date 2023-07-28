@@ -25,19 +25,22 @@ interface LocationData {
 
 export default function App() {
   const [data, setData] = React.useState<LocationData>();
+  const [loading, setLoading] = React.useState(false);
   React.useEffect(() => {
+    setLoading(true)
     fetch('https://api.techniknews.net/ipgeo/141.164.56.208')
       .then((res) => {
         return res.json();
       })
       .then((data) => {
         setData(data);
+        setLoading(false);
       })
       .catch();
   }, []);
   return (
     <div>
-      {data && (
+      {!loading && data && (
         <div>
           <p>IP地址：{data.ip}</p>
           {Object.entries(data).map(([key, value]) => (
@@ -47,6 +50,7 @@ export default function App() {
           ))}
         </div>
       )}
+      {loading && <p>Loading...</p>}
     </div>
   );
 }
